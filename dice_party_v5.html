@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dare Dice</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <div id="app">
+
+    <!-- HOME -->
+    <div id="home" class="screen active">
+      <div class="home-bg"></div>
+      <div class="home-bg-orb orb1"></div>
+      <div class="home-bg-orb orb2"></div>
+      <div class="topbar" style="max-width:340px">
+        <div class="sp"></div>
+        <button class="ico-btn" onclick="openSettings()" title="הגדרות">⚙️</button>
+      </div>
+      <div class="home-inner">
+        <span class="big-dice">🎲</span>
+        <h1 class="home-title">
+          <span class="ht1" id="ht1">קוביית</span><br>
+          <span class="ht2" id="ht2">החובות</span>
+        </h1>
+        <p class="home-sub" id="hsub">משחק קבוצתי • 2-10 שחקנים</p>
+        <div class="home-btns">
+          <button class="btn btn-primary" onclick="goTo('setup')" id="hstart">התחל משחק</button>
+          <button class="btn btn-ghost" onclick="goTo('rules-screen')" id="hrules">📖 חוקי המשחק</button>
+          <button class="btn btn-ghost" onclick="openHowTo()" id="hhowto">❓ איך משחקים?</button>
+        </div>
+        <div class="home-links">
+          <button class="link-btn" onclick="openTerms()" id="hterms">תקנון ותנאי שימוש</button>
+          <span style="color:var(--t3);font-size:.8rem">•</span>
+          <button class="link-btn" onclick="openHowTo()" id="hhowto2">מדריך למשחק</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RULES SCREEN -->
+    <div id="rules-screen" class="screen">
+      <div class="topbar">
+        <button class="back-btn" onclick="goTo('home')">← <span id="tb-back-r">חזרה</span></button>
+        <div class="sp"></div>
+        <button class="ico-btn" onclick="openSettings()">⚙️</button>
+      </div>
+      <div class="rules-wrap">
+        <div class="rules-h" id="r-title">📖 חוקי המשחק</div>
+        <div class="rules-sub-txt" id="r-sub">כל מה שצריך לדעת לפני שמתחילים</div>
+        <div class="how-box">
+          <div class="how-title" id="r-how">איך משחקים?</div>
+          <div id="how-rows"></div>
+        </div>
+        <div class="sec-divider" id="r-dice-lbl">חוקי הקוביה</div>
+        <div id="rule-cards"></div>
+        <button class="btn btn-primary" style="margin-top:.5rem" onclick="goTo('setup')" id="r-startbtn">התחל משחק
+          🎲</button>
+      </div>
+    </div>
+
+    <!-- SETUP -->
+    <div id="setup" class="screen">
+      <div class="topbar">
+        <button class="back-btn" onclick="goTo('home')">← <span id="tb-back-s">חזרה</span></button>
+        <div class="sp"></div>
+        <button class="ico-btn" onclick="openSettings()">⚙️</button>
+      </div>
+      <div class="card">
+        <div class="card-label" id="sl-players">שחקנים</div>
+        <div id="players-list"></div>
+        <button class="add-row" id="add-btn" onclick="addPlayer()">+ <span id="sl-add">הוסף שחקן</span></button>
+        <div class="err" id="setup-err"></div>
+      </div>
+      <div class="card">
+        <div class="card-label" id="sl-order">סדר תורות</div>
+        <div class="seg">
+          <button class="seg-btn on" id="btn-routine" onclick="setOrder('routine')">רוטיני</button>
+          <button class="seg-btn" id="btn-random" onclick="setOrder('random')">אקראי</button>
+        </div>
+      </div>
+      <div class="card" style="padding:1rem 1.5rem">
+        <label class="terms-check" id="terms-check-label">
+          <input type="checkbox" id="terms-cb">
+          <span id="terms-check-txt">קראתי ואני מסכים/ה ל<button onclick="openTerms();return false;"
+              style="background:none;border:none;font-family:inherit;font-size:inherit;color:var(--accent);text-decoration:underline;cursor:pointer;padding:0"
+              id="tc-link">תקנון ותנאי השימוש</button>. אני מאשר/ת שאני מעל גיל 18.</span>
+        </label>
+      </div>
+      <div style="width:100%;max-width:520px">
+        <button class="btn btn-primary" onclick="startGame()" id="sl-go">!בואו נשחק 🎲</button>
+      </div>
+    </div>
+
+    <!-- GAME -->
+    <div id="game" class="screen">
+      <div class="topbar">
+        <button class="ico-btn" onclick="confirmHome()" title="home">🏠</button>
+        <div class="sp"></div>
+        <button class="ico-btn" onclick="openSettings()">⚙️</button>
+      </div>
+      <div class="game-inner">
+        <div class="p-strip" id="p-strip"></div>
+        <div class="turn-block">
+          <div class="turn-lbl" id="g-turn-of">תור של</div>
+          <div class="turn-name" id="g-curr-name">-</div>
+        </div>
+        <div class="curse-pill" id="curse-pill"></div>
+        <div class="dice-zone">
+          <div class="dice-outer" onclick="rollDice()">
+            <div class="dice-face" id="dice-face">🎲</div>
+          </div>
+          <div class="dice-hint" id="g-hint">לחץ על הקוביה לזריקה</div>
+        </div>
+        <div class="result-card" id="result-card">
+          <div class="rc-num" id="rc-num"></div>
+          <div class="rc-emoji" id="rc-emoji"></div>
+          <div class="rc-head" id="rc-head"></div>
+          <div class="rc-body" id="rc-body"></div>
+          <div class="rc-actions">
+            <button class="btn-dare" id="dare-btn" style="display:none" onclick="openDare()">🔥 <span
+                id="g-dare-lbl">חובה
+                אקראית - לאמיצים</span></button>
+            <button class="btn-next" onclick="nextTurn()" id="g-next">הבא →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ OVERLAYS ═══ -->
+
+    <!-- SETTINGS -->
+    <div class="overlay" id="settings-modal">
+      <div class="modal">
+        <div class="modal-title" style="margin-bottom:1.2rem" id="set-title">⚙️ הגדרות</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label" id="set-lang-lbl">שפה</div>
+          </div>
+          <div class="lang-seg">
+            <button class="lang-opt on" id="lo-he" onclick="setLang('he')">עברית</button>
+            <button class="lang-opt" id="lo-en" onclick="setLang('en')">English</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label" id="set-dark-lbl">מצב לילה</div>
+            <div class="settings-sub" id="set-dark-sub">עיצוב כהה</div>
+          </div>
+          <button class="toggle" id="dark-toggle" onclick="toggleTheme()">
+            <div class="toggle-dot"></div>
+          </button>
+        </div>
+        <div class="settings-row" style="border-bottom:none">
+          <div>
+            <div class="settings-label" id="set-terms-lbl">תקנון</div>
+            <div class="settings-sub" id="set-terms-sub">תנאי שימוש והגבלת אחריות</div>
+          </div>
+          <button class="btn btn-ghost" style="width:auto;padding:.45rem 1rem;font-size:.82rem"
+            onclick="closeSettings();openTerms()">צפה</button>
+        </div>
+        <div style="margin-top:1.1rem">
+          <button class="btn btn-primary" onclick="closeSettings()" id="set-close">סגור</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TERMS -->
+    <div class="overlay" id="terms-modal">
+      <div class="modal" style="max-height:85vh;overflow-y:auto">
+        <span class="modal-icon">📋</span>
+        <div class="modal-title" id="terms-title">תקנון ותנאי שימוש</div>
+        <div class="modal-body" id="terms-body">
+          <b>⚠️ גיל מינימלי</b><br>
+          המשחק מיועד לבני 18 ומעלה בלבד. שימוש על ידי קטינים אסור.<br><br>
+          <b>🍺 צריכת אלכוהול</b><br>
+          המשחק עשוי לכלול התייחסות לצריכת אלכוהול. שתייה אחראית היא באחריות המשתתף בלבד. אל תשתה ותנהג.<br><br>
+          <b>🤝 כיבוד גבולות</b><br>
+          חובה לכבד את גבולות כל המשתתפים בכל עת. ניתן לסרב לכל חובה ללא הסבר. אין לכפות על אף משתתף לבצע דבר שאינו
+          רוצה.<br><br>
+          <b>⚖️ הגבלת אחריות</b><br>
+          השימוש במשחק הינו באחריות המשתמש בלבד. מפתחי המשחק אינם אחראים לכל נזק גופני, נפשי, רכושי או אחר שעלול להיגרם
+          כתוצאה ישירה או עקיפה מהשימוש במשחק, בתכניו, או בחובות המוצגות בו.<br><br>
+          <b>🔒 פרטיות</b><br>
+          המשחק אינו אוסף, שומר או מעביר מידע אישי לשרתים חיצוניים. כל הנתונים נשמרים מקומית בדפדפן בלבד.<br><br>
+          <b>✅ הסכמה</b><br>
+          שימוש במשחק מהווה הסכמה מלאה לתנאים אלו.
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" onclick="closeTerms()" id="terms-close">הבנתי ומסכים/ה</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW TO PLAY -->
+    <div class="overlay" id="howto-modal">
+      <div class="modal" style="max-height:88vh;overflow-y:auto">
+        <span class="modal-icon">🎲</span>
+        <div class="modal-title" id="ht-title">איך משחקים?</div>
+        <div class="modal-body" id="ht-body">
+          <b>הכנה:</b>
+          <ul>
+            <li>הכניסו 2–10 שמות שחקנים</li>
+            <li>בחרו סדר תורות — רוטיני או אקראי</li>
+            <li>אשרו את התקנון והתחילו!</li>
+          </ul>
+          <br><b>בכל תור:</b>
+          <ul>
+            <li>השחקן שתורו לוחץ על הקוביה</li>
+            <li>מבצע את החובה שיצאה</li>
+            <li>לוחץ "הבא" לתור הבא</li>
+          </ul>
+          <br><b>חוקי הקוביה:</b>
+          <ul>
+            <li>🍺 <b>1</b> — שתה ציסר אחד</li>
+            <li>💫 <b>2</b> — עמוד ועשה 2 סיבובים</li>
+            <li>🕵️ <b>3</b> — 2 שקר + 1 אמת, כולם מנחשים</li>
+            <li>😈 <b>4</b> — קלף קללה עד התור הבא</li>
+            <li>🔥 <b>5</b> — חובה אקראית (לאמיצים!)</li>
+            <li>👋 <b>6</b> — מישהו מבחוץ זורק ובוחר</li>
+          </ul>
+          <br><b>⚠️ חשוב:</b><br>
+          יש לכבד את גבולות כל המשתתפים. ניתן לסרב לכל חובה. המשחק מיועד לבני 18+.
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" onclick="closeHowTo()" id="ht-close">הבנתי, בואו נשחק!</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DARE MODAL -->
+    <div class="overlay" id="dare-modal">
+      <div class="dare-modal-inner">
+        <span class="modal-icon">🔥</span>
+        <div class="modal-title" id="m-your-dare">החובה שלך:</div>
+        <div class="modal-body" style="text-align:center;font-size:1.05rem;color:var(--t1);font-weight:600"
+          id="m-dare-text"></div>
+        <div class="modal-actions" style="margin-top:1.4rem">
+          <button class="btn btn-secondary" onclick="closeDare()" id="m-done">ביצעתי! ✅</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSTAGRAM POPUP -->
+    <div class="overlay" id="ig-modal">
+      <div class="ig-modal-inner">
+        <span class="modal-icon">📸</span>
+        <div class="ig-gradient">עוקבים?</div>
+        <div style="font-size:.88rem;color:var(--t2);margin:.6rem 0 1.2rem;line-height:1.6">
+          נהנים מהמשחק? 🎉<br>
+          עקבו בינסטגרם לעוד תכנים כיפיים!
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" onclick="openIG()"
+            style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)">
+            📸 לעמוד האינסטגרם
+          </button>
+          <button class="btn btn-ghost" onclick="closeIG()" id="ig-skip">אולי מאוחר יותר</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const IG_HANDLE = 'your_instagram'; // ← שנה לשם המשתמש שלך
+
+    const T = {
+      he: {
+        ht1: 'קוביית', ht2: 'החובות', hsub: 'משחק קבוצתי • 2-10 שחקנים', hstart: 'התחל משחק', hrules: '📖 חוקי המשחק',
+        hhowto: '❓ איך משחקים?', hterms: 'תקנון ותנאי שימוש', hhowto2: 'מדריך למשחק',
+        back: 'חזרה', rTitle: '📖 חוקי המשחק', rSub: 'כל מה שצריך לדעת', rHow: 'איך משחקים?',
+        rDiceLbl: 'חוקי הקוביה', rStartBtn: 'התחל משחק 🎲',
+        slPlayers: 'שחקנים', slOrder: 'סדר תורות', slAdd: 'הוסף שחקן', slGo: '!בואו נשחק 🎲',
+        routine: 'רוטיני', random: 'אקראי',
+        gTurnOf: 'תור של', gHint: 'לחץ על הקוביה לזריקה', gDareLbl: 'חובה אקראית - לאמיצים',
+        gNext: 'הבא →', mYourDare: 'החובה שלך:', mDone: 'ביצעתי! ✅',
+        errMsg: 'נדרשים לפחות 2 שחקנים עם שמות', errTerms: 'יש לאשר את התקנון לפני התחלת המשחק',
+        pPlaceholder: 'שם שחקן', activeCurse: 'קללה פעילה:',
+        setTitle: '⚙️ הגדרות', setLang: 'שפה', setDark: 'מצב לילה', setDarkSub: 'עיצוב כהה', setTerms: 'תקנון', setTermsSub: 'תנאי שימוש והגבלת אחריות', setClose: 'סגור',
+        termsTitle: 'תקנון ותנאי שימוש', termsClose: 'הבנתי ומסכים/ה', htTitle: 'איך משחקים?', htClose: 'הבנתי, בואו נשחק!',
+        igSkip: 'אולי מאוחר יותר',
+        tcLink: 'תקנון ותנאי השימוש',
+        howRows: ['2 עד 10 שחקנים מתיישבים יחד', 'בכל תור שחקן אחד זורק ומבצע חובה', 'סדר רוטיני או אקראי — בוחרים בהתחלה', 'יש לכבד גבולות כל המשתתפים! ❤️'],
+        rNames: ['1 — שתה ציסר', '2 — סיבובים', '3 — שניים שקר, אחד אמת', '4 — קלף קללה', '5 — חובה אקראית', '6 — שליח חיצוני'],
+        rDescs: ['השחקן שזרק חייב לשתות ציסר אחד.', 'לעמוד ולסובב פעמיים. נפל? ציסר בונוס.', '3 סיפורים — 2 שקר ו-1 אמת. מי שטועה שותה!', 'קללה אקראית עד התור הבא. שובר? שותה.', 'לחץ לחובה מפתיעה — אין תירוצים.', 'מישהו מבחוץ זורק. המספר קובע מי מבצע. 6 = חוזר.'],
+        rTags: ['השחקן שזרק', 'השחקן שזרק', 'כולם משתתפים', 'עד התור הבא', 'לאמיצים בלבד', 'אדם מבחוץ זורק'],
+        rResults: ['שתה ציסר!', 'סיבובים!', 'שניים שקר, אחד אמת', 'קלף קללה!', 'חובה אקראית!', 'שליח חיצוני!'],
+        rEmojis: ['🍺', '💫', '🕵️', '😈', '🔥', '👋'],
+        rDescGame: ['על השחקן לשתות ציסר אחד. 🍺', 'לעמוד ולעשות 2 סיבובים במקום. 💫', 'ספר 3 סיפורים — 2 שקר ו-1 אמת. מי שטועה שותה! 🕵️', '', 'לחץ על הכפתור לחובה אקראית... אם אתה אמיץ.', 'מצא מישהו שלא משחק ותן לו לזרוק. 6 = זריקה חוזרת. 👋'],
+        curses: ['לחייך חיוך מוגזם עד התור הבא', 'לעמוד על רגל אחת עד התור הבא', 'לדבר בלבד בשאלות עד התור הבא', 'לא להשתמש בשם של אף אחד עד התור הבא', 'לדבר בלחש בלבד עד התור הבא', 'לשמור על פנים רציניות בלי לצחוק', 'לדבר בגוף שלישי על עצמך', 'לסיים כל משפט במילה "מה"'],
+        dares: ['לחקות שחקן אחר עד שמנחשים מי זה', 'לשיר 30 שניות מהשיר האחרון ששמעת', 'לשלוח הודעה למישהו שלא דיברת איתו חודש', 'לעשות 10 שכיבות סמיכה', 'לצלם סלפי מוזר ולשלוח לאנשי הקשר', 'לספר את הדבר הכי מביך שקרה לך השנה', 'לאכול משהו שנותן לך אחד מהשחקנים', 'לחקות חיה למשך דקה', 'לשנות תמונת פרופיל לתמונה שבוחרים השחקנים', 'להתקשר ולשיר יום הולדת לאחד מאנשי הקשר'],
+      },
+      en: {
+        ht1: 'Dare', ht2: 'Dice', hsub: 'Party game • 2–10 players', hstart: 'Start Game', hrules: '📖 Rules',
+        hhowto: '❓ How to play?', hterms: 'Terms of use', hhowto2: 'Game guide',
+        back: 'Back', rTitle: '📖 Game Rules', rSub: 'Everything you need to know', rHow: 'How to play?',
+        rDiceLbl: 'Dice rules', rStartBtn: 'Start Game 🎲',
+        slPlayers: 'Players', slOrder: 'Turn order', slAdd: 'Add player', slGo: "Let's play! 🎲",
+        routine: 'Sequential', random: 'Random',
+        gTurnOf: "It's", gHint: 'Tap the dice to roll', gDareLbl: 'Random Dare — For the brave',
+        gNext: 'Next →', mYourDare: 'Your dare:', mDone: 'Done! ✅',
+        errMsg: 'Need at least 2 players with names', errTerms: 'Please accept the terms before starting',
+        pPlaceholder: 'Player name', activeCurse: 'Active curse:',
+        setTitle: '⚙️ Settings', setLang: 'Language', setDark: 'Dark mode', setDarkSub: 'Dark theme', setTerms: 'Terms', setTermsSub: 'Terms of use & disclaimer', setClose: 'Close',
+        termsTitle: 'Terms of Use', termsClose: 'I agree', htTitle: 'How to play?', htClose: "Got it, let's play!",
+        igSkip: 'Maybe later', tcLink: 'Terms of Use',
+        howRows: ['2 to 10 players sit together', 'Each turn one player rolls and performs', 'Sequential or random order — chosen at start', 'Always respect every player\'s boundaries! ❤️'],
+        rNames: ['1 — Drink a shot', '2 — Spin around', '3 — Two lies, one truth', '4 — Curse card', '5 — Random dare', '6 — Outside messenger'],
+        rDescs: ['The roller drinks one shot.', 'Stand and spin twice. Fall? Bonus shot.', '3 stories — 2 lies and 1 truth. Wrong guessers drink!', 'Random curse until your next turn. Break it? Drink.', 'Press for a surprise dare — no excuses.', 'Someone outside rolls. The number picks who acts. 6 = reroll.'],
+        rTags: ['Roller only', 'Roller only', 'Everyone plays', 'Until next turn', 'Brave only', 'Outsider rolls'],
+        rResults: ['Drink a shot!', 'Spin around!', 'Two lies, one truth', 'Curse card!', 'Random dare!', 'Outside messenger!'],
+        rEmojis: ['🍺', '💫', '🕵️', '😈', '🔥', '👋'],
+        rDescGame: ['The player must drink one shot. 🍺', 'Stand up and spin around twice. 💫', 'Tell 3 stories — 2 lies and 1 truth. Wrong guessers drink! 🕵️', '', 'Press the button for a random dare... if you dare.', 'Find someone not playing and let them roll. 6 = reroll. 👋'],
+        curses: ['Keep a huge smile until your next turn', 'Stand on one leg until your next turn', 'Only speak in questions until your next turn', 'Cannot say any player\'s name until your next turn', 'Only whisper until your next turn', 'Keep a straight face — no laughing', 'Refer to yourself in third person', 'End every sentence with "what"'],
+        dares: ['Mimic another player until someone guesses who', 'Sing 30 seconds of the last song you heard', 'Text someone you haven\'t spoken to in a month', 'Do 10 push-ups', 'Take a weird selfie and send it to recent contacts', 'Share the most embarrassing thing this year', 'Eat something another player gives you', 'Imitate an animal for one minute', 'Change profile picture to one players choose for an hour', 'Call a contact and sing them happy birthday'],
+      }
+    };
+
+    let lang = localStorage.getItem('dLang') || 'he';
+    let dark = localStorage.getItem('dDark') === 'true';
+    let players = [], order = 'routine', currIdx = 0, turnOrder = [], cursed = {}, rolling = false;
+    let totalTurns = 0;
+    let igShownThisGame = false;
+
+    const AC = window.AudioContext || window.webkitAudioContext;
+    let ac = null;
+    function getAC() { if (!ac) try { ac = new AC() } catch (e) { } return ac; }
+    function tone(f, d, t = 'sine', v = .28) { const a = getAC(); if (!a) return; const o = a.createOscillator(), g = a.createGain(); o.connect(g); g.connect(a.destination); o.type = t; o.frequency.value = f; g.gain.setValueAtTime(v, a.currentTime); g.gain.exponentialRampToValueAtTime(.001, a.currentTime + d); o.start(); o.stop(a.currentTime + d); }
+    function sndClick() { tone(900, .07, 'square', .07); }
+    function sndRoll() { for (let i = 0; i < 10; i++)setTimeout(() => tone(150 + Math.random() * 500, .05, 'square', .11), i * 55); }
+    function sndResult(n) { const m = { 1: [[523, .4]], 2: [[659, .15], [784, .25]], 3: [[523, .18], [659, .18], [784, .25]], 4: [[280, .3, 'sawtooth', .18], [200, .35, 'sawtooth', .18]], 5: [[800, .12], [900, .12], [1000, .2]], 6: [[440, .1], [554, .1], [659, .18]] }; (m[n] || []).forEach(([f, d, t, v], i) => setTimeout(() => tone(f, d, t || 'sine', v || .28), i * 140)); }
+
+    function applyTheme() {
+      document.body.classList.toggle('dark', dark);
+      const dt = document.getElementById('dark-toggle');
+      if (dt) { dt.className = 'toggle ' + (dark ? 'on' : 'off'); dt.querySelector('.toggle-dot').style.left = dark ? '25px' : '3px'; }
+      localStorage.setItem('dDark', dark);
+    }
+    function toggleTheme() { dark = !dark; applyTheme(); sndClick(); }
+
+    function setLang(l) {
+      lang = l; sndClick();
+      document.getElementById('lo-he').classList.toggle('on', l === 'he');
+      document.getElementById('lo-en').classList.toggle('on', l === 'en');
+      applyLang();
+    }
+
+    function applyLang() {
+      const t = T[lang], he = lang === 'he';
+      document.body.style.direction = he ? 'rtl' : 'ltr';
+      const map = {
+        ht1: t.ht1, ht2: t.ht2, hsub: t.hsub, hstart: t.hstart, hrules: t.hrules,
+        hhowto: t.hhowto, hterms: t.hterms, hhowto2: t.hhowto2,
+        'tb-back-r': t.back, 'tb-back-s': t.back,
+        'r-title': t.rTitle, 'r-sub': t.rSub, 'r-how': t.rHow, 'r-dice-lbl': t.rDiceLbl, 'r-startbtn': t.rStartBtn,
+        'sl-players': t.slPlayers, 'sl-order': t.slOrder, 'sl-add': t.slAdd, 'sl-go': t.slGo,
+        'g-turn-of': t.gTurnOf, 'g-hint': t.gHint, 'g-dare-lbl': t.gDareLbl, 'g-next': t.gNext,
+        'm-your-dare': t.mYourDare, 'm-done': t.mDone,
+        'set-title': t.setTitle, 'set-lang-lbl': t.setLang, 'set-dark-lbl': t.setDark, 'set-dark-sub': t.setDarkSub,
+        'set-terms-lbl': t.setTerms, 'set-terms-sub': t.setTermsSub, 'set-close': t.setClose,
+        'terms-title': t.termsTitle, 'terms-close': t.termsClose, 'ht-title': t.htTitle, 'ht-close': t.htClose,
+        'ig-skip': t.igSkip, 'tc-link': t.tcLink,
+      };
+      Object.entries(map).forEach(([id, v]) => { const el = document.getElementById(id); if (el) el.textContent = v; });
+      document.getElementById('btn-routine').textContent = t.routine;
+      document.getElementById('btn-random').textContent = t.random;
+      localStorage.setItem('dLang', lang);
+      renderRules();
+      if (players.length) renderPlayers();
+    }
+
+    function renderRules() {
+      const t = T[lang];
+      const hr = document.getElementById('how-rows');
+      if (hr) hr.innerHTML = t.howRows.map(r => `<div class="how-row"><div class="how-dot"></div><div class="how-txt">${r}</div></div>`).join('');
+      const rc = document.getElementById('rule-cards');
+      const cls = ['ri1', 'ri2', 'ri3', 'ri4', 'ri5', 'ri6'];
+      if (rc) rc.innerHTML = t.rNames.map((n, i) => `
+    <div class="rule-row">
+      <div class="r-icon ${cls[i]}">${t.rEmojis[i]}</div>
+      <div><div class="r-name">${n}</div><div class="r-desc">${t.rDescs[i]}</div><span class="r-tag">${t.rTags[i]}</span></div>
+    </div>`).join('');
+    }
+
+    function goTo(id) {
+      sndClick();
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if (id === 'setup') initSetup();
+    }
+
+    function confirmHome() {
+      sndClick();
+      if (confirm(lang === 'he' ? 'לצאת למסך הבית? ההתקדמות תאבד.' : 'Go to home? Progress will be lost.')) { goTo('home'); }
+    }
+
+    function initSetup() {
+      const s = JSON.parse(localStorage.getItem('dState') || 'null');
+      if (s && s.players) players = s.players;
+      else if (!players.length) players = ['', ''];
+      order = s?.order || 'routine';
+      setOrder(order); renderPlayers();
+    }
+
+    function renderPlayers() {
+      const t = T[lang], list = document.getElementById('players-list');
+      list.innerHTML = '';
+      players.forEach((name, i) => {
+        const row = document.createElement('div'); row.className = 'player-row';
+        row.innerHTML = `<div class="p-avatar">${i + 1}</div>
+      <input class="p-input" type="text" placeholder="${t.pPlaceholder} ${i + 1}" value="${name}" oninput="players[${i}]=this.value" maxlength="20"/>
+      ${players.length > 2 ? `<button class="rm-btn" onclick="removePlayer(${i})">✕</button>` : '<div style="width:36px"></div>'}`;
+        list.appendChild(row);
+      });
+      document.getElementById('add-btn').style.display = players.length >= 10 ? 'none' : 'block';
+    }
+
+    function addPlayer() { if (players.length < 10) { players.push(''); renderPlayers(); sndClick(); } }
+    function removePlayer(i) { players.splice(i, 1); renderPlayers(); sndClick(); }
+    function setOrder(o) {
+      order = o;
+      document.getElementById('btn-routine').classList.toggle('on', o === 'routine');
+      document.getElementById('btn-random').classList.toggle('on', o === 'random');
+    }
+
+    function startGame() {
+      const t = T[lang], err = document.getElementById('setup-err');
+      const filled = players.filter(p => p.trim());
+      if (filled.length < 2) { err.textContent = t.errMsg; err.style.display = 'block'; return; }
+      if (!document.getElementById('terms-cb').checked) { err.textContent = t.errTerms; err.style.display = 'block'; return; }
+      err.style.display = 'none';
+      players = filled; turnOrder = [...players.keys()];
+      if (order === 'random') shuffle(turnOrder);
+      currIdx = 0; cursed = {}; totalTurns = 0; igShownThisGame = false;
+      save(); goTo('game'); renderGame();
+    }
+
+    function save() { localStorage.setItem('dState', JSON.stringify({ players, order, turnOrder, currIdx, cursed, totalTurns })); }
+    function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } }
+
+    function renderGame() {
+      const t = T[lang], strip = document.getElementById('p-strip');
+      strip.innerHTML = '';
+      players.forEach((name, i) => {
+        const c = document.createElement('div');
+        c.className = 'p-chip' + (i === turnOrder[currIdx] ? ' active' : '') + (cursed[i] ? ' cursed' : '');
+        c.textContent = name + (cursed[i] ? ' 😈' : '');
+        strip.appendChild(c);
+      });
+      document.getElementById('g-curr-name').textContent = players[turnOrder[currIdx]];
+      document.getElementById('result-card').classList.remove('vis');
+      document.getElementById('dice-face').textContent = '🎲';
+      document.getElementById('g-hint').textContent = t.gHint;
+      document.getElementById('dare-modal').classList.remove('open');
+      const pill = document.getElementById('curse-pill');
+      const idx = turnOrder[currIdx];
+      if (cursed[idx]) { pill.textContent = t.activeCurse + ' ' + cursed[idx]; pill.classList.add('vis'); delete cursed[idx]; }
+      else pill.classList.remove('vis');
+    }
+
+    function rollDice() {
+      if (rolling) return; rolling = true; sndRoll();
+      document.getElementById('g-hint').textContent = '';
+      const face = document.getElementById('dice-face');
+      face.classList.add('rolling');
+      let ticks = 0;
+      const iv = setInterval(() => {
+        face.textContent = String(Math.floor(Math.random() * 6) + 1);
+        if (++ticks > 13) {
+          clearInterval(iv);
+          const r = Math.floor(Math.random() * 6) + 1;
+          face.textContent = r; face.classList.remove('rolling');
+          setTimeout(() => sndResult(r), 60);
+          showResult(r); rolling = false;
+        }
+      }, 52);
+    }
+
+    function showResult(n) {
+      const t = T[lang], card = document.getElementById('result-card');
+      document.getElementById('rc-num').textContent = n;
+      document.getElementById('rc-emoji').textContent = t.rEmojis[n - 1];
+      document.getElementById('rc-head').textContent = t.rResults[n - 1];
+      const db = document.getElementById('dare-btn'); db.style.display = 'none';
+      if (n === 4) {
+        const c = t.curses[Math.floor(Math.random() * t.curses.length)];
+        cursed[turnOrder[currIdx]] = c;
+        document.getElementById('rc-body').textContent = (lang === 'he' ? 'הקללה שלך: ' : 'Your curse: ') + c;
+      } else if (n === 5) {
+        document.getElementById('rc-body').textContent = t.rDescGame[4];
+        db.style.display = 'block';
+        document.getElementById('g-dare-lbl').textContent = t.gDareLbl;
+      } else {
+        document.getElementById('rc-body').textContent = t.rDescGame[n - 1];
+      }
+      card.classList.add('vis'); save();
+    }
+
+    function nextTurn() {
+      sndClick();
+      totalTurns++;
+      currIdx = (currIdx + 1) % turnOrder.length;
+      save();
+      renderGame();
+      if (totalTurns === 10 && !igShownThisGame) {
+        igShownThisGame = true;
+        setTimeout(() => document.getElementById('ig-modal').classList.add('open'), 600);
+      }
+    }
+
+    /* MODALS */
+    function openSettings() { sndClick(); document.getElementById('settings-modal').classList.add('open'); }
+    function closeSettings() { sndClick(); document.getElementById('settings-modal').classList.remove('open'); }
+    function openTerms() { sndClick(); document.getElementById('terms-modal').classList.add('open'); }
+    function closeTerms() { sndClick(); document.getElementById('terms-modal').classList.remove('open'); }
+    function openHowTo() { sndClick(); document.getElementById('howto-modal').classList.add('open'); }
+    function closeHowTo() { sndClick(); document.getElementById('howto-modal').classList.remove('open'); }
+    function openDare() { sndClick(); document.getElementById('m-dare-text').textContent = T[lang].dares[Math.floor(Math.random() * T[lang].dares.length)]; document.getElementById('dare-modal').classList.add('open'); }
+    function closeDare() { sndClick(); document.getElementById('dare-modal').classList.remove('open'); }
+    function openIG() { window.open(`https://instagram.com/${IG_HANDLE}`, '_blank'); closeIG(); }
+    function closeIG() { sndClick(); document.getElementById('ig-modal').classList.remove('open'); }
+
+    /* CLOSE ON BACKDROP */
+    document.querySelectorAll('.overlay').forEach(ov => {
+      ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('open'); });
+    });
+
+    function loadSaved() {
+      const s = JSON.parse(localStorage.getItem('dState') || 'null');
+      if (s && s.players?.length >= 2) { players = s.players; order = s.order || 'routine'; turnOrder = s.turnOrder || [...players.keys()]; currIdx = s.currIdx || 0; cursed = s.cursed || {}; totalTurns = s.totalTurns || 0; }
+    }
+
+    loadSaved(); applyTheme(); applyLang();
+  </script>
+</body>
+
+</html>
